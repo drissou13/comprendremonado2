@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Dico Intégral des Jeunes - Version Clash</title>
+    <style>
+        :root {
+            --primary: #1e272e;
+            --accent: #05c46b;
+            --accent-critique: #ff4757;
+            --bg: #f1f2f6;
+            --card-bg: #ffffff;
+            --text: #2f3542;
+            --light-gray: #ced6e0;
+            --badge-cat: #57606f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin: 20px 0 30px 0;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            color: #57606f;
+            font-size: 1.2rem;
+        }
+
+        .counter {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .main-layout {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .container {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #ced6e0;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            outline: none;
+            transition: all 0.3s;
+            margin-bottom: 25px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .search-box:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(5, 196, 107, 0.2);
+        }
+
+        .alphabet-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f2f6;
+        }
+
+        .letter-btn {
+            background: #e4e7eb;
+            border: none;
+            color: var(--primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .letter-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .letter-btn.active {
+            background: var(--accent-critique);
+            color: white;
+        }
+
+        .letter-btn.disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+            background: #f1f2f6;
+            color: #b2bec3;
+        }
+
+        .entry-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .entry {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 6px solid var(--accent);
+            transition: all 0.2s;
+        }
+
+        .entry:hover {
+            transform: translateX(4px);
+            background: #f1f2f6;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .word-badge {
+            background: var(--primary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .category-badge {
+            background: var(--badge-cat);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .translation {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .translation strong {
+            color: var(--accent-critique);
+        }
+
+        .example {
+            font-style: italic;
+            color: #57606f;
+            border-left: 3px solid #ced6e0;
+            padding-left: 12px;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        .no-result {
+            text-align: center;
+            color: #a4b0be;
+            font-size: 1.2rem;
+            padding: 40px 20px;
+        }
+
+        /* --- SPACE ADO ANIMÉ --- */
+        .ado-container {
+            width: 240px;
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .bubble {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 12px 15px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            text-align: center;
+            width: 100%;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent;
+            display: block;
+            width: 0;
+        }
+
+        .bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 11px 11px 0;
+            border-style: solid;
+            border-color: var(--primary) transparent;
+            display: block;
+            width: 0;
+            z-index: -1;
+        }
+
+        .ado-avatar {
+            width: 140px;
+            height: 180px;
+            position: relative;
+            background: #ff7675;
+            border-radius: 50px 50px 10px 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .ado-avatar::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: 60px;
+            background: #d63031;
+            border-radius: 60px 60px 0 0;
+            z-index: 1;
+        }
+
+        .face {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            width: 90px;
+            height: 80px;
+            background: #ffeaa7;
+            border-radius: 40px;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .eyes {
+            display: flex;
+            gap: 20px;
+        }
+
+        .eye {
+            width: 12px;
+            height: 4px;
+            background: #2d3436;
+            border-radius: 2px;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .ado-avatar.sigh .eye {
+            height: 8px;
+            border-radius: 50% 50% 0 0;
+            background: transparent;
+            border-top: 4px solid #2d3436;
+        }
+
+        .acne {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #e17055;
+            border-radius: 50%;
+            top: 45px;
+            left: 20px;
+            box-shadow: 45px 5px 0 #e17055, 15px 10px 0 #e17055;
+        }
+
+        .phone {
+            position: absolute;
+            bottom: 10px;
+            left: 45px;
+            width: 50px;
+            height: 35px;
+            background: #2d3436;
+            border-radius: 5px 5px 0 0;
+            border: 2px solid #636e72;
+            z-index: 3;
+            animation: phoneChilling 2s infinite alternate;
+        }
+
+        .phone::after {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            background: #00cec9;
+            box-shadow: 0 0 10px #00cec9;
+            opacity: 0.8;
+        }
+
+        .ado-avatar.typing .phone {
+            animation: phoneTyping 0.1s infinite alternate;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        @keyframes phoneChilling {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(2px) rotate(2deg); }
+        }
+        @keyframes phoneTyping {
+            0% { transform: translate(1px, 1px) rotate(1deg); }
+            100% { transform: translate(-1px, -1px) rotate(-1deg); }
+        }
+
+        @media (max-width: 850px) {
+            .main-layout { flex-direction: column-reverse; align-items: center; }
+            .ado-container { position: relative; margin-bottom: 25px; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Le Lexique Intégral & Mode Ado</h1>
+        <p>Le dictionnaire complet de A à Z surveillé par FLAVIE BURANET, notre ado adepte du tacle gratuit.</p>
+        <div class="counter" id="totalCounter">0 mots enregistrés</div>
+    </header>
+
+    <div class="main-layout">
+        <div class="container">
+            <input type="text" id="search" class="search-box" placeholder="Tapez pour chercher (et prendre une bâche de Léo...)" oninput="rechercheGlobale()">
+            <div class="alphabet-nav" id="alphabetBar"></div>
+            <div id="list" class="entry-list"></div>
+        </div>
+
+        <div class="ado-container">
+            <div class="bubble" id="adoBubble">Tiens, un fossile. Tu cherches la définition de "Rhumatisme" ?</div>
+            <div class="ado-avatar" id="leo">
+                <div class="face">
+                    <div class="eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="acne"></div>
+                </div>
+                <div class="phone"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Base de données intégrale des expressions de A à Z
+        const dictionnaire = [
+            { mot: "Apanyae", cat: "Piège sonore", trad: "Strictement aucun sens. C'est une feinte pour vous couper la parole si vous dites 'Hein'.", ex: "- Hein ? - Apanyae !" },
+            { mot: "Asap", cat: "Travail / Pro", trad: "Dès que possible, au plus vite. Issu de l'anglais 'As Soon As Possible'.", ex: "Renvoie-moi le dossier de com asap s'il te plaît." },
+            { mot: "Bail", cat: "Divers", trad: "Une affaire, un projet, une histoire secrète ou un truc en cours.", ex: "C'est quoi vos bails là-bas avec l'autre classe ?" },
+            { mot: "Banger", cat: "Éloge", trad: "Une pépite, un truc incroyable et lourd (musique, film, plat ou idée).", ex: "Le nouveau burger de la carte, c'est un banger absolu." },
+            { mot: "Bsahtek", cat: "Félicitations", trad: "Félicitations ! Bravo à toi. Issu de l'arabe populaire.", ex: "Bsahtek ton nouveau permis de conduire !" },
+            { mot: "Caps", cat: "Réseaux Sociaux", trad: "Une capture d'écran sur smartphone (ou screenshot).", ex: "Supprime le message, elle va faire une caps et l'envoyer à tout le monde." },
+            { mot: "Charo", cat: "Séduction", trad: "Un grand séducteur / un dragueur compulsif sans aucun filtre.", ex: "Laisse tomber, ce mec calcule toutes les meufs, c'est un charo." },
+            { mot: "Cheh", cat: "Ironie", trad: "Bien fait pour toi ! Souvent utilisé avec une pointe de sadisme amical.", ex: "Tu es resté au lit et tu as loupé ton bus ? Cheh !" },
+            { mot: "Chelou", cat: "Verlan", trad: "Bizarre, suspect, louche.", ex: "Le voisin du troisième a un comportement super chelou." },
+            { mot: "Chiller", cat: "Détente", trad: "Se relaxer, passer du bon temps tranquille sans stresser.", ex: "Ce week-end, on va juste chiller devant la console." },
+            { mot: "Chouffer", cat: "Action", trad: "Regarder intensément, épier ou fixer du regard.", ex: "Pourquoi le vigile me chouffe comme ça depuis tout à l'heure ?" },
+            { mot: "Cringe", cat: "Jugement", trad: "Extrêmement malaisant, très gênant au point d'en avoir des frissons.", ex: "Quand papa essaie de danser sur TikTok, c'est trop cringe." },
+            { mot: "Crush", cat: "Amour", trad: "Le coup de cœur amoureux secret, la personne sur qui on craque.", ex: "J'ai croisé mon crush à la cantine, j'ai bégayé grave." },
+            { mot: "Dead ça", cat: "Éloge", trad: "Gérer une tâche ou une performance à la perfection.", ex: "Elle a dead son examen de piano, le jury a adoré." },
+            { mot: "De fou / De ouf", cat: "Validation", trad: "Totalement d'accord / À fond.", ex: "- C'était dur l'évaluation ? - De fou !" },
+            { mot: "Disquette", cat: "Séduction", trad: "Une phrase de drague toute faite ou un mensonge bien emballé.", ex: "Il m'a sorti une sacrée disquette pour justifier son retard." },
+            { mot: "En lousdé", cat: "Discrétion", trad: "En cachette, en douce, sans se faire repérer.", ex: "Il a récupéré le dernier biscuit en lousdé pendant qu'on parlait." },
+            { mot: "Flex", cat: "Comportement", trad: "Frimer, se vanter ouvertement de sa réussite ou de ses marques.", ex: "Il passe ses journées à flexer avec ses nouvelles baskets." },
+            { mot: "Flop", cat: "Échec", trad: "Un échec total, un bide complet.", ex: "Ma blague en plein dîner de famille a fait un gros flop." },
+            { mot: "Foulek", cat: "Comportement", trad: "S'agiter, faire le fou, chercher des noises.", ex: "Fais pas le foulek avec moi, parle correctement." },
+            { mot: "Frérot", cat: "Interjection", trad: "Terme affectueux pour appeler un ami proche (ou n'importe qui).", ex: "Tranquille frérot, t'inquiète, je gère le truc." },
+            { mot: "Gaver", cat: "Émotion", trad: "Énerver au plus haut point (ou 'beaucoup' pour les Bordelais).", ex: "Attendre sous la pluie, ça me gave d'une force." },
+            { mot: "Ghoster", cat: "Rupture", trad: "Couper brusquement tout contact avec quelqu'un sur les réseaux sans un mot.", ex: "On s'est vus une fois, et depuis elle me ghoste complètement." },
+            { mot: "Glow up", cat: "Évolution", trad: "Une métamorphose physique ou de style super positive.", ex: "Depuis qu'il a changé de coupe, il a fait un vrai glow up." },
+            { mot: "Goat", cat: "Éloge", trad: "Le meilleur de tous les temps. Acronyme de 'Greatest Of All Time'.", ex: "Ne cherche pas, dans l'histoire du foot, Pelé c'est le GOAT." },
+            { mot: "Hype", cat: "Tendances", trad: "L'engouement excessif, l'excitation ou l'ambiance ultra-populaire autour d'une nouveauté.", ex: "Je comprends pas trop la hype autour de cette nouvelle série." },
+            { mot: "In real life (IRL)", cat: "Internet", trad: "Dans la vraie vie, hors des écrans.", ex: "Il est sympa sur Discord, mais je l'ai jamais vu IRL." },
+            { mot: "Inox", cat: "Éloge", trad: "Solide, incroyable, qui ne bouge pas (en référence au créateur Inoxtag).", ex: "Ton style aujourd'hui il est carrément inox !" },
+            { mot: "J'avoue", cat: "Validation", trad: "Formule d'approbation rapide pour dire 'c'est tout à fait vrai'.", ex: "- Le film était super long. - J'avoue." },
+            { mot: "Jumeau", cat: "Interjection", trad: "Surnom fraternel donné à un très bon pote.", ex: "Wesh jumeau, on va au McDo après les cours ?" },
+            { mot: "Ken", cat: "Verlan", trad: "Coucher avec quelqu'un (ou se faire rouler / arnaquer).", ex: "Le garagiste m'a bien ken sur la facture des réparations." },
+            { mot: "Le sang", cat: "Affection", trad: "Un ami extrêmement cher, un membre de la famille de cœur.", ex: "Toi mon pote, tu es le sang, je t'oublierai jamais." },
+            { mot: "Masterclass", cat: "Éloge", trad: "Une action parfaite, un coup de génie absolu.", ex: "Le prof d'histoire a fait une masterclass aujourd'hui, c'était passionnant." },
+            { mot: "Miskine", cat: "Pitié", trad: "Le pauvre / La pauvre. Utilisé par compassion ou ironie.", ex: "Il a fait tomber sa glace par terre, miskine." },
+            { mot: "Mytho", cat: "Jugement", trad: "Un menteur compulsif ou une histoire totalement bidon.", ex: "Ne l'écoute pas, il raconte qu'il a une villa, c'est un mytho." },
+            { mot: "No cap", cat: "Serment", trad: "Pas de mensonge, c'est du sérieux, je jure que c'est vrai.", ex: "J'ai eu 20/20 au contrôle de physique, no cap !" },
+            { mot: "Nrv (Enervé)", cat: "Intensité", trad: "Excellent, très puissant, incroyable.", ex: "Le nouveau design de ta bécane, il est nrv !" },
+            { mot: "Oklm", cat: "Détente", trad: "Au calme. Tranquille, sans aucune pression.", ex: "Je suis posé sur la plage, oklm." },
+            { mot: "Osef", cat: "Indifférence", trad: "On s'en fout. Signifie que le sujet n'a aucun intérêt.", ex: "Il m'a dit qu'il avait mangé des pâtes, mais on osef de sa vie." },
+            { mot: "Payer son loyer", cat: "Expression", trad: "Avoir une pensée, une idée ou une chanson bloquée en boucle dans la tête H24.", ex: "Ce refrain de TikTok vit dans mon cerveau sans payer de loyer." },
+            { mot: "Poucave", cat: "Comportement", trad: "Une balance, un dénonciateur.", ex: "Raconte rien au délégué, c'est une grosse poucave." },
+            { mot: "Quoicoubeh", cat: "Piège sonore", trad: "Blague sans queue ni tête pour piéger les adultes disant 'Quoi'.", ex: "- Tu as dit quoi ? - Quoicoubeh !" },
+            { mot: "Relou", cat: "Verlan", trad: "Lourd, pénible, agaçant.", ex: "C'est vraiment relou d'avoir une coupure de courant en plein film." },
+            { mot: "Rizz", cat: "Séduction", trad: "Le charisme brut, la capacité de draguer et charmer instantanément.", ex: "Il n'a même pas fait d'effort mais il a un rizz de fou." },
+            { mot: "Sah", cat: "Validation", trad: "Sérieusement, franchement, en toute vérité.", ex: "Sah, ce burger est le meilleur de la ville." },
+            { mot: "Sigma", cat: "Comportement", trad: "Un loup solitaire, indépendant, charismatique qui réussit tout en solo.", ex: "Il ne traîne avec personne mais gère sa vie, pur style sigma." },
+            { mot: "Skeu skeu", cat: "Tendance", trad: "Une danse ou une posture un peu ridicule à la mode sur TikTok.", ex: "Regarde-les faire les skeu skeu devant la caméra." },
+            { mot: "Skibid", cat: "Mème", trad: "Expression fourre-tout de la Gen Alpha pour qualifier un truc bizarre ou cool.", ex: "C'est trop skibid ton histoire." },
+            { mot: "Starfoullah", cat: "Choc", trad: "Expression de choc, d'indignation ou de surprise forte.", ex: "Starfoullah, comment tu as pu ranger ta chambre comme ça ?" },
+            { mot: "Tarpin", cat: "Quantité", trad: "Très, beaucoup, énormément (Argot marseillais).", ex: "Il y a tarpin de monde à la caisse du supermarché." },
+            { mot: "Tchoin", cat: "Insulte", trad: "Fille au comportement ou à la tenue provocante.", ex: "Elle s'habille trop mal celle-là." },
+            { mot: "Un bide / Un flop", cat: "Échec", trad: "Une action ou une blague qui ne fait réagir personne.", ex: "Son histoire a fait un bide complet." },
+            { mot: "Vnr (Vénère)", cat: "Émotion", trad: "Énervé (en verlan).", ex: "Le prof m'a mis une heure de colle, je suis trop vnr." },
+            { mot: "Wallah", cat: "Serment", trad: "Je le jure. Sert à certifier qu'on dit la vérité pure.", ex: "Wallah c'est pas moi qui ai cassé la télé !" },
+            { mot: "Wesh", cat: "Interjection", trad: "Salut ! Quoi de neuf ? (Sert aussi de ponctuation).", ex: "Wesh l'équipe, on se capte où ce soir ?" },
+            { mot: "Xénomorphe", cat: "Humour", trad: "Un alien étrange. Surnom taquin donné à un pote qui agit bizarrement ou fait une tête bizarre.", ex: "Regarde la tête qu'il fait sur la photo, un vrai xénomorphe." },
+            { mot: "Yeet / Yolo", cat: "Action", trad: "Yeet : Lancer un truc super fort / Yolo : On ne vit qu'une fois (You Only Live Once).", ex: "Il a yeet ses clés par la fenêtre en criant Yolo !" },
+            { mot: "Zapper", cat: "Action", trad: "Oublier complètement de faire un truc ou passer à autre chose.", ex: "J'ai complètement zappé d'éteindre le four." },
+            { mot: "Zarbi", cat: "Verlan", trad: "Bizarre, étrange.", ex: "C'est zarbi, les clés n'étaient pas sur la table." }
+        ];
+
+        // Punchlines Écorchantes de FLAVIE BURANET
+        const punchlinesAdo = [
+            "Clique, clique... C'est bon pour l'arthrose de tes doigts.",
+            "Tu as connu le dictionnaire sur du vrai papyrus toi, non ?",
+            "Ne tape pas trop vite sur le clavier, tu vas te faire un claquage.",
+            "Tu cherches un mot ou tu vérifies ton solde de points CPF ?",
+            "J'ai un mot pour toi : 'Antiquité'. Ah non, il est pas dans la liste.",
+            "Wesh l'ancêtre, fais gaffe à pas bégayer en lisant.",
+            "Tu t'entraînes pour parler avec ton petit-fils ou c'est pour ta culture générale d'avant-guerre ?",
+            "Te fatigue pas, la moitié de ces mots seront périmés avant ta prochaine coloscopie.",
+            "Oublie pas de valider ton ticket de métro en carton en sortant d'ici."
+        ];
+
+        let lettreActive = "";
+        const leo = document.getElementById('leo');
+        const bubble = document.getElementById('adoBubble');
+
+        function animerAdo(statut) {
+            if (statut === 'typing') {
+                leo.classList.add('typing');
+                leo.classList.remove('sigh');
+                bubble.innerText = "Attends, j'envoie un Snap avant que tu me fatigues...";
+            } else if (statut === 'click') {
+                leo.classList.remove('typing');
+                leo.classList.add('sigh');
+                const phraseHasard = punchlinesAdo[Math.floor(Math.random() * punchlinesAdo.length)];
+                bubble.innerText = phraseHasard;
+                setTimeout(() => leo.classList.remove('sigh'), 1500);
+            }
+        }
+
+        function genererAlphabet() {
+            const bar = document.getElementById('alphabetBar');
+            bar.innerHTML = "";
+            const lettresExistantes = [...new Set(dictionnaire.map(item => item.mot.charAt(0).toUpperCase()))];
+            
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(lettre => {
+                const existe = lettresExistantes.includes(lettre);
+                const btn = document.createElement('button');
+                btn.innerText = lettre;
+                btn.className = `letter-btn ${lettreActive === lettre ? 'active' : ''} ${!existe ? 'disabled' : ''}`;
+                if (existe) {
+                    btn.onclick = () => {
+                        filtrerParLettre(lettre);
+                        animerAdo('click');
+                    };
+                } else { 
+                    btn.disabled = true; 
+                }
+                bar.appendChild(btn);
+            });
+        }
+
+        function afficherExpressions(liste) {
+            const container = document.getElementById('list');
+            container.innerHTML = "";
+
+            document.getElementById('totalCounter').innerText = `${liste.length} mot(s) listé(s)`;
+
+            if(liste.length === 0) {
+                container.innerHTML = `<div class="no-result">🤷‍♂️ Aucun résultat. Même au Moyen-Âge on disait pas ça.</div>`;
+                return;
+            }
+
+            liste.forEach(item => {
+                container.innerHTML += `
+                    <div class="entry">
+                        <div class="entry-header">
+                            <span class="word-badge">${item.mot}</span>
+                            <span class="category-badge">${item.cat}</span>
+                        </div>
+                        <div class="translation"><strong>Traduction Quadra :</strong> ${item.trad}</div>
+                        <div class="example"><strong>En situation :</strong> "${item.ex}"</div>
+                    </div>
+                `;
+            });
+        }
+
+        function filtrerParLettre(lettre) {
+            document.getElementById('search').value = "";
+            if (lettreActive === lettre) {
+                lettreActive = "";
+                afficherExpressions(dictionnaire);
+            } else {
+                lettreActive = lettre;
+                afficherExpressions(dictionnaire.filter(item => item.mot.charAt(0).toUpperCase() === lettre));
+            }
+            genererAlphabet();
+        }
+
+        let typingTimer;
+        function rechercheGlobale() {
+            lettreActive = "";
+            genererAlphabet();
+            
+            animerAdo('typing');
+            clearTimeout(typingTimer);
+            
+            const recherche = document.getElementById('search').value.toLowerCase().trim();
+            const filtre = dictionnaire.filter(item => 
+                item.mot.toLowerCase().includes(recherche) || 
+                item.trad.toLowerCase().includes(recherche) ||
+                item.cat.toLowerCase().includes(recherche)
+            );
+            afficherExpressions(filtre);
+
+            typingTimer = setTimeout(() => {
+                leo.classList.remove('typing');
+                if(recherche !== "") {
+                    bubble.innerText = "Tu cherches ça ? Laisse tomber, c'est trop moderne pour ton modem 56k.";
+                } else {
+                    bubble.innerText = "Allô ? T'as buggé ? C'est l'heure de la sieste ?";
+                }
+            }, 800);
+        }
+
+        window.onload = () => {
+            dictionnaire.sort((a, b) => a.mot.localeCompare(b.mot));
+            genererAlphabet();
+            afficherExpressions(dictionnaire);
+        };
+    </script>
+</body>
+</html>
