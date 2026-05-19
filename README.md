@@ -1,4 +1,4 @@
-# 🖕 Le Dico Intégral des Jeunes - Version Clash Flavie buranet
+#  Le Dico Intégral des Jeunes - Version Clash Flavie buranet
 
 Un dictionnaire interactif complet (de A à Z) pour enfin comprendre le jargon de la Gen Z et de la Gen Alpha, sans avoir à subir le regard vide de vos enfants. 
 
